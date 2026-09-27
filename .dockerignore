@@ -1,0 +1,27 @@
+# Version control, editor state, and local agent configuration.
+.git
+**/.git
+.github
+.agents
+.codex
+.vscode
+.idea
+**/.DS_Store
+**/*~
+**/*.swp
+
+# Generated output; keep PDF figures elsewhere available as build inputs.
+/pdf/
+/presentation.pdf
+/presentation-notes.pdf
+**/*.aux
+**/*.log
+**/*.nav
+**/*.out
+**/*.snm
+**/*.toc
+**/*.fls
+**/*.fdb_latexmk
+**/*.synctex.gz
+**/*.vrb
+**/*.rubbercache

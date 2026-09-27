@@ -1,0 +1,78 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{booktabs,amsmath,amssymb}
+\usepackage{tikz}
+\usepackage{pgfpages}
+\usepackage{qrcode}
+
+\usetikzlibrary{arrows.meta,positioning,calc,fit}
+
+\hypersetup{
+  pdfauthor={Manuel Barbosa, François Dupressoir,
+    Rui Fernandes, Andreas Hülsing, Matthias Meijers,
+  Pierre-Yves Strub},
+  pdftitle={Completing the Chain: Verified Implementations of
+  Hash-Based Signatures and Their Security}
+}
+
+\definecolor{Navy}{HTML}{102C46}
+\definecolor{Teal}{HTML}{00877E}
+\definecolor{Gold}{HTML}{B96A16}
+\definecolor{Mist}{HTML}{EDF4F6}
+\definecolor{Muted}{HTML}{526575}
+
+\setbeamercolor{normal text}{fg=Navy,bg=white}
+\setbeamercolor{frametitle}{fg=Navy}
+\setbeamercolor{structure}{fg=Teal}
+\setbeamercolor{alerted text}{fg=Gold}
+\setbeamercolor{block title}{fg=white,bg=Teal}
+\setbeamercolor{block body}{fg=Navy,bg=Mist}
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamerfont{title}{size=\LARGE,series=\bfseries}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize items}[circle]
+\setbeamersize{text margin left=8mm,text margin right=8mm}
+\setbeamertemplate{frametitle}{\vspace{4mm}\insertframetitle\par\vspace{1mm}}
+\setbeamertemplate{footline}{\hspace{8mm}\scriptsize\color{Muted}Completing
+the Chain\hfill CHES 2026\hspace{5mm}\insertframenumber\hspace{8mm}\vspace{3mm}}
+
+\title{Completing the Chain}
+\subtitle{Verified Implementations of Hash-Based Signatures\\and Their Security}
+\author{Manuel Barbosa \and François Dupressoir \and \textbf{Rui
+Fernandes}\\ Andreas Hülsing \and Matthias Meijers \and Pierre-Yves Strub}
+\date{CHES 2026}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture,overlay]
+    \node[anchor=south east,inner sep=0] at
+    ([xshift=-8mm,yshift=18mm]current page.south east) {%
+      \begin{minipage}{49mm}
+        \centering
+        \begin{minipage}{23mm}
+          \centering
+          {\color{black}\qrcode[height=19mm,level=M]{https://github.com/formosa-crypto/formosa-xmss}}\par\vspace{2mm}
+          {\scriptsize\color{Muted}Repository}
+        \end{minipage}\hfill
+        \begin{minipage}{23mm}
+          \centering
+          {\color{black}\qrcode[height=19mm,level=M]{https://doi.org/10.46586/tches.v2026.i3.958-981}}\par\vspace{2mm}
+          {\scriptsize\color{Muted}Paper}
+        \end{minipage}
+    \end{minipage}};
+  \end{tikzpicture}%
+  \vspace{5mm}
+  {\color{Teal}\small 11B: Implementation Tools \& Formal
+  Verification}\par\vspace{4mm}
+  {\usebeamerfont{title}\inserttitle\par}\vspace{3mm}
+  {\large\insertsubtitle\par}\vspace{7mm}
+  {\small\insertauthor\par}\vspace{5mm}
+  {\small\insertinstitute\par}\vfill\vspace{10mm}
+  {\small\color{Muted}CHES 2026\hfill TCHES 2026(3), pp. 958--981}
+\end{frame}
+
+\end{document}
