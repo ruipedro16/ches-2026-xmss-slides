@@ -8,8 +8,8 @@ all: format $(PDF)
 pdf/:
 	mkdir -p $@
 
-pdf/%.pdf: %.tex | pdf/
-	rubber --pdf --into pdf $<
+pdf/%.pdf: %.tex cryptobib/abbrev3.bib cryptobib/crypto.bib | pdf/
+	BIBINPUTS="$(CURDIR):" rubber --pdf --into pdf $<
 
 format: $(TEX)
 	nix-shell -p tex-fmt --run "tex-fmt $<" 2>/dev/null

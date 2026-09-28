@@ -9,3 +9,6 @@
 **/*.synctex.gz
 **/*.vrb
 **/*.rubbercache
+**/*.bbl
+**/*.blg
+_*
