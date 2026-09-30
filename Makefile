@@ -3,7 +3,7 @@
 TEX := slides.tex
 PDF := $(patsubst %.tex,pdf/%.pdf,$(TEX))
 
-all: format $(PDF)
+all: $(PDF)
 
 pdf/:
 	mkdir -p $@
@@ -11,8 +11,8 @@ pdf/:
 pdf/%.pdf: %.tex cryptobib/abbrev3.bib cryptobib/crypto.bib | pdf/
 	BIBINPUTS="$(CURDIR):" rubber --pdf --into pdf $<
 
-format: $(TEX)
-	nix-shell -p tex-fmt --run "tex-fmt $<" 2>/dev/null
+format: $(wildcard *.tex)
+	nix-shell -p tex-fmt --run "tex-fmt $^" 2>/dev/null
 
 clean:
 	-$(RM) -r pdf/

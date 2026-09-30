@@ -4,17 +4,23 @@
 
 \begin{frame}{Jasmin~\cite{CCS:ABBBGL17,SP:ABBGKL20}}
 
-\begin{itemize}
+  \begin{itemize}
     \item Stack zeroization~\cite{TCHES:OBGGLL24}
     \item (Static) Safety checker based on abstract interpretation
     \item Compiler correctness proved in Rocq
     \item Extraction to EasyCrypt
-    % \item Spectre~\cite{}
-\end{itemize}
+    \item Speculative constant-time:
+      \begin{itemize}
+        \item Spectre v1~\cite{SP:SBGLOP23} and other spectre variants~\cite{DBLP:conf/asplos/OlmosBCGL0SY025}
+        \item Compilation preserves SCT~\cite{DBLP:journals/pacmpl/OlmosBBGL25}.
+        \end{itemize}
+    \end{itemize}
 
-\vspace{2mm}
-\begin{block}{\textbf{Compiler Correctness \& Constant-Time Preservation}}
-    Compilation preserves the semantics of \emph{safe} source programs and constant-time behavior:
-    functional correctness and constant-time guarantees established at source level carry to the assembly level.
+  \vspace{2mm}
+  \begin{block}{\textbf{Compiler Correctness \& Constant-Time Preservation}}
+    Compilation preserves the semantics of \emph{safe} source
+    programs and constant-time behavior:
+    functional correctness and constant-time guarantees established
+    at source level carry to the assembly level.
   \end{block}
 \end{frame}

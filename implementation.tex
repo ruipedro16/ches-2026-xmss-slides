@@ -1,0 +1,19 @@
+\begin{frame}{Implementation: Performance}
+\begin{table}[t!]
+\scriptsize
+  \centering
+  \begin{tabular}{c c c c c}
+    \toprule
+           &  C Ref  & Jasmin (abs, \%)  & \begin{tabular}[c]{@{}c@{}}loop\\zeroization (abs, \%)\end{tabular} & \begin{tabular}[c]{@{}c@{}}unrolled\\zeroization (abs, \%)\end{tabular} \\
+    \midrule
+    \textbf{Keygen} & 10092.74 &  8263.54 (-18.12\%)  & 8293.61 (+0.36\%)  & 8312.35 (+0.59\%)  \\
+    \textbf{Sign}   & 20251.01 & 24775.17 (+22.34\%)  & 24872.05 (+0.39\%) & 24927.53 (+0.61\%) \\
+    \textbf{Verify} & 10.35    &  8.47 (-18.14\%)     & 8.48 (+0.13\%)     & 8.95 (+5.69\%) \\
+  \bottomrule \\
+  \end{tabular}
+  \caption{Performance Comparison between C and Jasmin implementations in
+  $10^6$ clock cycles (column \#2). Zeroization overhead w.r.t.
+  Jasmin baseline (columns \#3 and \#4).}
+  \label{tab:bench}
+\end{table}
+\end{frame}

@@ -2,13 +2,14 @@
   \centering
   \resizebox{\textwidth}{!}{%
     \begin{tikzpicture}[
-      panel/.style={draw=none, rounded corners=3mm},
-      component/.style={draw, rounded corners=2mm, line width=0.8pt,
-        fill=white, align=center, minimum height=12mm,
+        panel/.style={draw=none, rounded corners=3mm},
+        component/.style={draw, rounded corners=2mm, line width=0.8pt,
+          fill=white, align=center, minimum height=12mm,
         font=\footnotesize, text=Navy},
-      connection/.style={-{Stealth[length=2mm]}, draw=Muted, line width=0.8pt},
-      label/.style={font=\scriptsize, text=Muted, above=2mm}
-    ]
+        connection/.style={-{Stealth[length=2mm]}, draw=Muted, line
+        width=0.8pt},
+        label/.style={font=\scriptsize, text=Muted, above=2mm}
+      ]
       \path[panel, fill=Teal!7] (0,0) rectangle (7.4,3.6);
       \path[panel, fill=Navy!6] (8.9,0) rectangle (16.3,3.6);
       \node[font=\large\bfseries, text=Teal] at (3.7,2.95) {EasyCrypt};
@@ -17,52 +18,63 @@
       \draw[Navy!20, line width=0.6pt] (9.4,2.45) -- (15.8,2.45);
 
       \node[component, draw=Muted!55, fill=Mist,
-        minimum width=2.3cm] (rfc) at (-2.45,1.25)
-        {RFC 8391};
+      minimum width=2.3cm] (rfc) at (-2.45,1.25)
+      {RFC 8391};
       \node[component, draw=Teal!65,
-        minimum width=2.3cm] (spec) at (1.4,1.25)
-        {EasyCrypt\\specification};
+      minimum width=2.3cm] (spec) at (1.4,1.25)
+      {EasyCrypt\\specification};
       \node[component, draw=Teal!65,
-        minimum width=2.6cm] (model) at (5.9,1.25)
-        {EasyCrypt model\\of Jasmin impl.};
+      minimum width=2.6cm] (model) at (5.9,1.25)
+      {EasyCrypt model\\of Jasmin impl.};
       \node[component, draw=Navy!55,
-        minimum width=2.3cm] (impl) at (10.3,1.25)
-        {Jasmin\\implementation};
+      minimum width=2.3cm] (impl) at (10.3,1.25)
+      {Jasmin\\implementation};
       \node[component, draw=Navy!55,
-        minimum width=2.3cm] (asm) at (14.9,1.25)
-        {x86\_64\\assembly};
+      minimum width=2.3cm] (asm) at (14.9,1.25)
+      {x86\_64\\assembly};
 
       \draw[connection] (spec.west) --
-        node[label, align=center] {transcribed\\from} (rfc.east);
-      \draw[connection] (model.west) -- node[label] {implements} (spec.east);
+      node[label, align=center] {transcribed\\from} (rfc.east);
+      \draw[connection] (model.west) -- node[label] {adheres to} (spec.east);
       \draw[connection, dashed] (impl.west) --
-        node[label] {extracts to} (model.east);
+      node[label] {extracts to} (model.east);
       \draw[connection, dashed] (impl.east) --
-        node[label, align=center] {certified\\compilation} (asm.west);
+      node[label, align=center] {certified\\compilation} (asm.west);
     \end{tikzpicture}%
   }
 \end{frame}
 
 \begin{frame}[fragile]{Trusted Computing Base}
-\begin{figure}[t!]
+  \begin{itemize}
+    \item Correctness of the SHA-256 implementation is outside the
+      scope of the proof
+  \end{itemize}
 
-\begin{itemize}
-  \item Correctness of $\mathsf{SHA2}$ is assumed
-\end{itemize}
+  \vspace{7mm}
+  \begin{figure}[t!]
+    \centering
+    \begin{minipage}{.65\textwidth}
+      \begin{easycrypt}{}{}
+op Hash : W8.t list -> nbytes. (* Abstract operator *)
 
-\vspace{7mm}
-\centering
-\begin{minipage}{0.75\textwidth}
-\begin{easycrypt}{}{}
-axiom hash_128 (x : W8.t Array128.t) :
-  phoare[ 
-    M(Syscall).hash_plen_3n____sha256 : 
-    arg.`2 = x 
+axiom hash_128 (x : W8.t Array128.t):
+  phoare[
+    M(Syscall).hash_plen_3n____sha256:
+    arg.`2 = x
     ==>
-    to_list res = NBytes.val (Hash (to_list x)) 
+    to_list res = NBytes.val (Hash (to_list x))
   ] = 1%r.
-\end{easycrypt}
-\end{minipage}
-\caption{\EasyCrypt axiom stating the correctness of $\mathsf{SHA2}$.}
-\end{figure}
+      \end{easycrypt}
+    \end{minipage}
+    \caption{\EasyCrypt axiom stating the correctness of SHA-256.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{Trusted Computing Base}
+  \begin{itemize}
+    \item Jasmin compiler: unverified compilation passes (e.g.
+      parsing, pretyping, etc.)
+    \item Jasmin extraction to EasyCrypt
+    \item SMT Solvers (Z3, CVC4 and Alt-Ergo)
+  \end{itemize}
 \end{frame}
