@@ -10,19 +10,22 @@
         width=0.8pt},
         label/.style={font=\scriptsize, text=Muted, above=2mm}
       ]
-      \path[panel, fill=Teal!7] (0,0) rectangle (7.4,3.6);
-      \path[panel, fill=Navy!6] (8.9,0) rectangle (16.3,3.6);
-      \node[font=\large\bfseries, text=Teal] at (3.7,2.95) {EasyCrypt};
-      \node[font=\large\bfseries, text=Navy] at (12.6,2.95) {Jasmin};
-      \draw[Teal!25, line width=0.6pt] (0.5,2.45) -- (6.9,2.45);
-      \draw[Navy!20, line width=0.6pt] (9.4,2.45) -- (15.8,2.45);
+      \path[panel, fill=Teal!7] (-0.6,0) rectangle (7.4,5.5);
+      \path[panel, fill=Navy!6] (8.9,0) rectangle (16.3,5.5);
+      \node[font=\large\bfseries, text=Teal] at (3.4,4.85) {EasyCrypt};
+      \node[font=\large\bfseries, text=Navy] at (12.6,4.85) {Jasmin};
+      \draw[Teal!25, line width=0.6pt] (-0.1,4.35) -- (6.9,4.35);
+      \draw[Navy!20, line width=0.6pt] (9.4,4.35) -- (15.8,4.35);
 
       \node[component, draw=Muted!55, fill=Mist,
-      minimum width=2.3cm] (rfc) at (-2.45,1.25)
+      minimum width=2.3cm] (rfc) at (-2.45,2.4)
       {RFC 8391};
       \node[component, draw=Teal!65,
       minimum width=2.3cm] (spec) at (1.4,1.25)
-      {EasyCrypt\\specification};
+      {EasyCrypt specification\\of XMSS};
+      \node[component, draw=Teal!65,
+      minimum width=2.3cm] (specmt) at (1.4,3.55)
+      {EasyCrypt specification\\of $\mathrm{XMSS}^{\mathrm{MT}}$};
       \node[component, draw=Teal!65,
       minimum width=2.6cm] (model) at (5.9,1.25)
       {EasyCrypt model\\of Jasmin impl.};
@@ -34,12 +37,19 @@
       {x86\_64\\assembly};
 
       \draw[connection] (spec.west) --
-      node[label, align=center] {transcribed\\from} (rfc.east);
+      node[font=\scriptsize, text=Muted, below=2mm, xshift=-3mm, align=center]
+      {transcribed\\from} ([yshift=-2mm]rfc.east);
+      \draw[connection] (specmt.west) --
+      node[label, xshift=-3mm, align=center] {transcribed\\from} ([yshift=2mm]rfc.east);
       \draw[connection] (model.west) -- node[label] {adheres to} (spec.east);
+      \draw[connection, {Stealth[length=2mm]}-{Stealth[length=2mm]}] (specmt.south) --
+      node[font=\scriptsize, text=Muted, right=2mm, align=left]
+      {functional equivalence} (spec.north);
       \draw[connection, dashed] (impl.west) --
       node[label] {extracts to} (model.east);
       \draw[connection, dashed] (impl.east) --
-      node[label, align=center] {certified\\compilation} (asm.west);
+      node[font=\scriptsize, text=Muted, below=2mm, align=center]
+      {certified\\compilation} (asm.west);
     \end{tikzpicture}%
   }
 \end{frame}
