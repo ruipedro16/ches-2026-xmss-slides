@@ -17,12 +17,12 @@
         width=0.8pt},
         label/.style={font=\scriptsize, text=Muted, above=2mm}
       ]
-      \path[panel, fill=Teal!7] (-0.6,0) rectangle (7.4,5.5);
-      \path[panel, fill=Navy!6] (8.9,0) rectangle (16.3,5.5);
-      \node[font=\large\bfseries, text=Teal] at (3.4,4.85) {EasyCrypt};
-      \node[font=\large\bfseries, text=Navy] at (12.6,4.85) {Jasmin};
-      \draw[Teal!25, line width=0.6pt] (-0.1,4.35) -- (6.9,4.35);
-      \draw[Navy!20, line width=0.6pt] (9.4,4.35) -- (15.8,4.35);
+      \path[panel, fill=Teal!7] (-0.6,0) rectangle (7.7,8.6);
+      \path[panel, fill=Navy!6] (8.9,0) rectangle (16.3,8.6);
+      \node[font=\large\bfseries, text=Teal] at (3.4,7.95) {EasyCrypt};
+      \node[font=\large\bfseries, text=Navy] at (12.6,7.95) {Jasmin};
+      \draw[Teal!25, line width=0.6pt] (-0.1,7.45) -- (6.9,7.45);
+      \draw[Navy!20, line width=0.6pt] (9.4,7.45) -- (15.8,7.45);
 
       \node[component, visible on=<2->, draw=Muted!55, fill=Mist,
       minimum width=2.3cm] (rfc) at (-2.45,2.4)
@@ -33,12 +33,23 @@
       \node[component, visible on=<3->, draw=Teal!65,
       minimum width=2.3cm] (specmt) at (1.4,3.55)
       {EasyCrypt specification\\of $\mathrm{XMSS}$};
-      \node[component, visible on=<7->, draw=Teal!65,
+      \node[component, visible on=<10->, draw=Teal!65,
+      minimum width=2.9cm] (security) at (1.4,5.65)
+      {Security Specification\\of \xmss};
+      \node[component, visible on=<11->, draw=Teal!65,
+      minimum width=2.9cm] (parametric) at (5.9,5.65)
+      {Parametric RFC\\Specification of \xmss};
+      \node[font=\scriptsize, text=Muted, visible on=<10->,
+        anchor=south west, yshift=1mm, align=left] at (security.north west)
+        {provably secure\\{[CRYPTO 23]}};
+      \node[font=\scriptsize, text=Muted, visible on=<11->,
+        anchor=south west, yshift=2mm] at (parametric.north west) {provably secure};
+      \node[component, visible on=<8->, draw=Teal!65,
       minimum width=2.6cm] (model) at (5.9,1.25)
       {EasyCrypt model\\of Jasmin impl.};
       \node[component, visible on=<5->, draw=Navy!55,
       minimum width=2.3cm] (impl) at (10.3,1.25)
-      {Jasmin\\implementation};
+      {Jasmin\\implementation\\of \xmssmt};
       \node[component, visible on=<6->, draw=Navy!55,
       minimum width=2.3cm] (asm) at (14.9,1.25)
       {x86\_64\\assembly};
@@ -48,12 +59,23 @@
       {transcribed\\from} ([yshift=-2mm]rfc.east);
       \draw[connection, visible on=<3->] (specmt.west) --
       node[label, xshift=-3mm, align=center] {transcribed\\from} ([yshift=2mm]rfc.east);
-      \draw[connection, visible on=<8->] (model.west) -- node[label] {adheres to} (spec.east);
+      \draw[connection, visible on=<9->] (model.west) -- node[label] {adheres to} (spec.east);
       \draw[connection, visible on=<4->, {Stealth[length=2mm]}-{Stealth[length=2mm]}] (specmt.south) --
       node[font=\scriptsize, text=Muted, right=2mm, align=left]
       {functional equivalence \\ when $d=1$} (spec.north);
-      \draw[connection, dashed, visible on=<7->] (impl.west) --
+      \draw[connection, visible on=<11->] (security.east) --
+        node[label, align=center] {reduces\\to} (parametric.west);
+      \draw[connection, visible on=<12->] (specmt.east) -|
+        node[font=\scriptsize, text=Muted, pos=0.75, right=2mm]
+        {instantiates} (parametric.south);
+      \draw[connection, dashed, visible on=<8->] (impl.west) --
       node[label] {extracts to} (model.east);
+      \draw[connection, dashed, visible on=<7->]
+        ([xshift=-4mm]impl.north) .. controls
+        ([xshift=-16mm,yshift=12mm]impl.north) and
+        ([xshift=16mm,yshift=12mm]impl.north) ..
+        node[font=\scriptsize, text=Muted, above=2mm, pos=0.5, align=center]
+        {Constant-Time\\checker} ([xshift=4mm]impl.north);
       \draw[connection, dashed, visible on=<6->] (impl.east) --
       node[font=\scriptsize, text=Muted, below=2mm, align=center]
       {certified\\compilation} (asm.west);
