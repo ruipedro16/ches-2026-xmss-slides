@@ -1,16 +1,25 @@
 \begin{frame}{Jasmin~\cite{CCS:ABBBGL17,SP:ABBGKL20}}
 
+\begin{itemize}
+  \setlength{\itemsep}{4mm}
+  \item High-level assembly language designed for cryptography implementations
+  \item High-level zero-cost abstractions: variables, arrays
+  \item Control over low-level details (e.g. instruction selection, loop unrolling)
+  \item Suported architectures: x86\_64, ARMv7M, ARMv8-A, RISC-V
+\end{itemize}
+
 \end{frame}
 
 \begin{frame}{Jasmin~\cite{CCS:ABBBGL17,SP:ABBGKL20}}
 
   \begin{itemize}
+    \setlength{\itemsep}{2mm}
     \item Stack zeroization~\cite{TCHES:OBGGLL24}
-    \item (Static) Safety checker based on abstract interpretation
+    \item (Static) Safety checker
     \item Compiler correctness proved in Rocq
     \item Extraction to EasyCrypt
     \item Speculative constant-time:
-      \begin{itemize}
+      \begin{itemize}\setlength{\itemsep}{1mm}
         \item Spectre v1~\cite{SP:SBGLOP23} and other spectre variants~\cite{DBLP:conf/asplos/OlmosBCGL0SY025}
         \item Compilation preserves SCT~\cite{DBLP:journals/pacmpl/OlmosBBGL25}.
         \end{itemize}

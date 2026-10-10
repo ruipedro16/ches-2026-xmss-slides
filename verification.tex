@@ -1,59 +1,3 @@
-\begin{frame}{Verification Workflow}
-  \centering
-  \resizebox{\textwidth}{!}{%
-    \begin{tikzpicture}[
-        panel/.style={draw=none, rounded corners=3mm},
-        component/.style={draw, rounded corners=2mm, line width=0.8pt,
-          fill=white, align=center, minimum height=12mm,
-        font=\footnotesize, text=Navy},
-        connection/.style={-{Stealth[length=2mm]}, draw=Muted, line
-        width=0.8pt},
-        label/.style={font=\scriptsize, text=Muted, above=2mm}
-      ]
-      \path[panel, fill=Teal!7] (-0.6,0) rectangle (7.4,5.5);
-      \path[panel, fill=Navy!6] (8.9,0) rectangle (16.3,5.5);
-      \node[font=\large\bfseries, text=Teal] at (3.4,4.85) {EasyCrypt};
-      \node[font=\large\bfseries, text=Navy] at (12.6,4.85) {Jasmin};
-      \draw[Teal!25, line width=0.6pt] (-0.1,4.35) -- (6.9,4.35);
-      \draw[Navy!20, line width=0.6pt] (9.4,4.35) -- (15.8,4.35);
-
-      \node[component, draw=Muted!55, fill=Mist,
-      minimum width=2.3cm] (rfc) at (-2.45,2.4)
-      {RFC 8391};
-      \node[component, draw=Teal!65,
-      minimum width=2.3cm] (spec) at (1.4,1.25)
-      {EasyCrypt specification\\of XMSS};
-      \node[component, draw=Teal!65,
-      minimum width=2.3cm] (specmt) at (1.4,3.55)
-      {EasyCrypt specification\\of $\mathrm{XMSS}^{\mathrm{MT}}$};
-      \node[component, draw=Teal!65,
-      minimum width=2.6cm] (model) at (5.9,1.25)
-      {EasyCrypt model\\of Jasmin impl.};
-      \node[component, draw=Navy!55,
-      minimum width=2.3cm] (impl) at (10.3,1.25)
-      {Jasmin\\implementation};
-      \node[component, draw=Navy!55,
-      minimum width=2.3cm] (asm) at (14.9,1.25)
-      {x86\_64\\assembly};
-
-      \draw[connection] (spec.west) --
-      node[font=\scriptsize, text=Muted, below=2mm, xshift=-3mm, align=center]
-      {transcribed\\from} ([yshift=-2mm]rfc.east);
-      \draw[connection] (specmt.west) --
-      node[label, xshift=-3mm, align=center] {transcribed\\from} ([yshift=2mm]rfc.east);
-      \draw[connection] (model.west) -- node[label] {adheres to} (spec.east);
-      \draw[connection, {Stealth[length=2mm]}-{Stealth[length=2mm]}] (specmt.south) --
-      node[font=\scriptsize, text=Muted, right=2mm, align=left]
-      {functional equivalence} (spec.north);
-      \draw[connection, dashed] (impl.west) --
-      node[label] {extracts to} (model.east);
-      \draw[connection, dashed] (impl.east) --
-      node[font=\scriptsize, text=Muted, below=2mm, align=center]
-      {certified\\compilation} (asm.west);
-    \end{tikzpicture}%
-  }
-\end{frame}
-
 \begin{frame}[fragile]{Trusted Computing Base}
   \begin{itemize}
     \item Correctness of the SHA-256 implementation is outside the
@@ -82,9 +26,9 @@ axiom hash_128 (x : W8.t Array128.t):
 
 \begin{frame}{Trusted Computing Base}
   \begin{itemize}
-    \item Jasmin compiler: unverified compilation passes (e.g.
-      parsing, pretyping, etc.)
+    \item Jasmin compiler: unverified OCaml code (parsing and typing)
     \item Jasmin extraction to EasyCrypt
+    \item EasyCrypt codebase
     \item SMT Solvers (Z3, CVC4 and Alt-Ergo)
   \end{itemize}
 \end{frame}

@@ -1,0 +1,217 @@
+% XMSS key generation: RFC 8391, Section 4.1.7.
+% Local overlay styles keep the diagram geometry fixed between steps.
+\tikzset{
+  xmss hidden/.style={opacity=0,text opacity=0},
+  xmss show/.code args={<#1>}{\alt<#1>{}{\pgfkeysalso{xmss hidden}}},
+  xmss node/.style={circle,draw=Teal,fill=Mist,minimum size=5mm,
+    inner sep=0pt}
+}
+
+% Example tree with height h=3.
+\newcommand{\xmsskeygentree}{%
+  \begin{tikzpicture}[x=0.68cm,y=0.68cm,font=\scriptsize,>=Latex]
+    \foreach \i in {0,...,7} {
+      \node[xmss node, xmss show=<1->]
+        (l\i) at (\i,0) {};
+      % Two vertically separated keys represent the secret/public keypair.
+      \begin{scope}[shift={(\i,-1.35)},draw=Gold,line width=0.7pt]
+        \foreach \keyheight in {-0.16,0.16} {
+          \draw (-0.15,\keyheight) circle[radius=0.075cm];
+          \draw (-0.04,\keyheight) -- (0.22,\keyheight);
+          \draw (0.13,\keyheight) -- (0.13,\keyheight-0.10);
+          \draw (0.22,\keyheight) -- (0.22,\keyheight-0.10);
+        }
+      \end{scope}
+      \draw[->,Teal] (\i,-1.05) --
+        node[midway,right,rotate=90,anchor=south,font=\tiny] {LTree}
+        (l\i.south);
+    }
+    \node[text=Gold] at (3.5,-1.95) {WOTS+ keypairs};
+    \foreach \i/\x in {0/0.5,1/2.5,2/4.5,3/6.5} {
+      \node[xmss node,xmss show=<2->] (p\i) at (\x,1) {};
+      \pgfmathtruncatemacro{\leftleaf}{2*\i}
+      \pgfmathtruncatemacro{\rightleaf}{2*\i+1}
+      \draw[Muted,xmss show=<2->] (p\i) -- (l\leftleaf);
+      \draw[Muted,xmss show=<2->] (p\i) -- (l\rightleaf);
+    }
+    \node[xmss node,xmss show=<3->] (q0) at (1.5,2) {};
+    \node[xmss node,xmss show=<3->] (q1) at (5.5,2) {};
+    \foreach \parent/\child in {q0/p0,q0/p1,q1/p2,q1/p3}
+      \draw[Muted,xmss show=<3->] (\parent) -- (\child);
+    \node[xmss node,xmss show=<4->]
+      (r) at (3.5,3) {};
+    \foreach \child in {q0,q1}
+      \draw[Muted,xmss show=<4->] (r) -- (\child);
+  \end{tikzpicture}%
+}
+
+\begin{frame}{XMSS: Overview}
+  \begin{itemize}
+    \setlength{\itemsep}{4mm}
+    \item XMSS~\cite{DBLP:conf/pqcrypto/BuchmannDH11} is a stateful hash-based signature scheme.
+    \item Security relies on the security of the underlying hash function.
+    \item XMSS combines a one-time signature scheme (WOTS+) with a Merkle tree.
+    \vspace{2mm}
+    \begin{itemize}
+      \setlength{\itemsep}{1mm}
+      \item The root of the Merkle tree is the public key of the XMSS instance.
+      \item Each leaf corresponds to a (compressed) WOTS+ public key.
+      \item A Merkle tree of height $h$ has $2^h$ leaves, and thus allows $2^h$ signing $2^h$ messages.
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{XMSS: Key Generation}
+  \small
+  \setbeamerfont{itemize/enumerate body}{size=\small}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.54\textwidth}
+      \begin{enumerate}
+        \item<1-> Start from $2^h$ WOTS+ keypairs: one for each leaf
+          of the tree.
+        \item<1-> Compress each WOTS+ public key via an L-tree
+          (LTree) to an $n$-byte value. These values are the leaves.
+        \item<2-> Hash pairs of nodes upward, level by level,
+          to obtain the $n$-byte root.
+      \end{enumerate}
+      {\setbeamerfont{block title}{size=\small}
+        \setbeamerfont{block body}{size=\footnotesize}
+        \begin{block}{Scheme parameters}
+          $h$: tree height ($2^h$ leaves).\\
+          $n$: hash output length in bytes.
+        \end{block}
+}
+    \end{column}
+    \begin{column}{0.43\textwidth}
+      \centering
+      \vspace{3mm}
+      \xmsskeygentree\\[3mm]
+      \small Example: $h=3$
+
+    \end{column}
+  \end{columns}
+  \vspace{0mm}
+  {\footnotesize
+    \textbf{Public key:} $\mathsf{PK}=(\mathsf{root},\mathsf{SEED})$, with public seed $\mathsf{SEED}$.\\
+    \textbf{Secret key:} $\mathsf{SK}=(i,\{\mathsf{sk}^{\mathrm{WOTS+}}_j\}_{j=0}^{2^h-1},\mathsf{SK}_{\mathrm{PRF}},\mathsf{PK})$.\\
+    $i=0$: next unused leaf; $\mathsf{SK}_{\mathrm{PRF}}$: secret key for message randomization.
+  }
+\end{frame}
+
+\begin{frame}{XMSS: Signature Verification}
+  \relax
+  {\small
+    Inputs: message $M$, $\mathsf{PK}=(\mathsf{root},\mathsf{SEED})$,
+    $\sigma=(i,R,\sigma_{\mathrm{WOTS+}},\mathsf{auth}_i)$.\par}
+  \vspace{2mm}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.54\textwidth}
+      \begin{enumerate}
+        \small
+        \setlength{\itemsep}{0.5mm}
+        \item<1-> Check the signature format and $0\leq i<2^h$;
+          recompute the message digest $D$.
+        \item<2-> Complete the WOTS+ chains from
+          $\sigma_{\mathrm{WOTS+}}$ to recover $\mathsf{pk}_i$.
+          LTree compression gives leaf $i$.
+        \item<3-> Hash upward with the $h$ authentication siblings.
+          Bits of $i$ determine left/right order.
+        \item<5-> Accept if the reconstructed root equals
+          $\mathsf{root}$ in the public key.
+      \end{enumerate}
+    \end{column}
+    \begin{column}{0.43\textwidth}
+      \centering
+      \vspace{2mm}
+      \begin{tikzpicture}[x=0.68cm,y=0.7cm,font=\scriptsize]
+        \foreach \i in {0,...,7}
+          \node[xmss node,draw=Muted!45,fill=white] (v\i) at (\i,0) {};
+        \foreach \i/\x in {0/0.5,1/2.5,2/4.5,3/6.5} {
+          \node[xmss node,draw=Muted!45,fill=white] (p\i) at (\x,1) {};
+          \pgfmathtruncatemacro{\leftleaf}{2*\i}
+          \pgfmathtruncatemacro{\rightleaf}{2*\i+1}
+          \draw[Muted!40] (p\i) -- (v\leftleaf);
+          \draw[Muted!40] (p\i) -- (v\rightleaf);
+        }
+        \node[xmss node,draw=Muted!45,fill=white] (q0) at (1.5,2) {};
+        \node[xmss node,draw=Muted!45,fill=white] (q1) at (5.5,2) {};
+        \node[xmss node,draw=Muted!45,fill=white,label=above:{public root}]
+          (r) at (3.5,3) {};
+        \foreach \parent/\child in {q0/p0,q0/p1,q1/p2,q1/p3,r/q0,r/q1}
+          \draw[Muted!40] (\parent) -- (\child);
+        \foreach \name in {v3,p0,q1}
+          \node[xmss node,draw=Gold,fill=Gold!20] at (\name) {};
+        \foreach \name/\step in {v2/2,p1/3,q0/4,r/5}
+          \node[xmss node,fill=Teal!25,xmss show=<\step->] at (\name) {};
+        \foreach \parent/\child/\step in {p1/v2/3,q0/p1/4,r/q0/5}
+          \draw[Teal,line width=1.2pt,xmss show=<\step->]
+            (\parent) -- (\child);
+        \node[below=2mm of v2,align=center,xmss show=<2->]
+          {$\mathrm{LTree}(\mathsf{pk}_i)$\\$i=2$};
+      \end{tikzpicture}\\[1mm]
+      {\footnotesize\color{Gold}Gold: supplied authentication siblings.}\\
+      {\footnotesize\color{Teal}Teal: reconstructed path.}
+    \end{column}
+  \end{columns}
+  \vspace{1mm}
+  {\small
+    $D=H_{\mathrm{msg}}(R\mathbin\Vert\mathsf{root}\mathbin\Vert i,M)$
+    \quad (encodings omitted).}
+  % RFC 8391, Section 4.1.10. Node hashing uses seed/address-derived keys and masks.
+\end{frame}
+
+\begin{frame}{\texorpdfstring{$\mathrm{XMSS}^{\mathrm{MT}}$}{XMSS-MT}: Multi-Tree Variant}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.53\textwidth}
+      \begin{itemize}
+        \small
+        \setlength{\itemsep}{2mm}
+        \item<1-> Split total height $h$ into $d$ layers of XMSS
+          trees, each of height $h/d$.
+        \item<2-> Bottom-layer WOTS+ keys sign message digests.
+        \item<3-> Upper-layer WOTS+ keys sign the roots of trees
+          in the layer below.
+        \item<4-> Verify layer by layer up to the single public root.
+      \end{itemize}
+      \uncover<4->{%
+        {\setbeamerfont{block title}{size=\small}
+          \setbeamerfont{block body}{size=\footnotesize}
+          \begin{block}{Tradeoff}
+            $2^h$ messages; smaller trees to generate.\\[1mm]
+            Signature: $d$ WOTS+ signatures and $h$ path nodes.\\[1mm]
+            Still stateful; $d=1$ gives XMSS.
+          \end{block}}}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \centering
+      \vspace{2mm}
+      \begin{tikzpicture}[x=1cm,y=0.75cm,font=\scriptsize,>=Latex]
+        \node[xmss node,label=above:{public root}] (r) at (2.4,4.6) {};
+        \node[xmss node] (p0) at (1.2,3.9) {};
+        \node[xmss node] (p1) at (3.6,3.9) {};
+        \foreach \parent in {p0,p1}
+          \draw[Teal] (r) -- (\parent);
+        \foreach \j/\x/\parent in {0/0.6/p0,1/1.8/p0,2/3.0/p1,3/4.2/p1} {
+          \node[xmss node] (u\j) at (\x,3.1) {};
+          \draw[Teal] (\parent) -- (u\j);
+          \coordinate (b\j) at (\x,1.9);
+          \draw[Teal,fill=Mist,xmss show=<2->]
+            (b\j) -- (\x-0.5,0.9) -- (\x+0.5,0.9) -- cycle;
+          \draw[->,Gold,thick,xmss show=<3->] (b\j) -- (u\j.south);
+        }
+        \node[xmss node,xmss show=<2->] (leaf) at (1.8,0.9) {};
+        \node[xmss show=<2->] (digest) at (1.8,0.1) {$D$};
+        \draw[->,Gold,thick,xmss show=<2->] (digest) -- (leaf);
+        \node[text=Muted,anchor=east] at (4.7,4.7) {top layer};
+        \node[text=Muted,xmss show=<2->,anchor=east] at (4.7,0.2)
+          {bottom layer};
+        \node[text=Gold,xmss show=<3->,fill=white,inner sep=1pt]
+          at (2.4,2.5) {WOTS+};
+      \end{tikzpicture}\\[2mm]
+      {\footnotesize Example: $h=4$, $d=2$.}\\[1mm]
+      {\scriptsize\color{Gold}Gold arrows: WOTS+ signs a digest or root.}
+    \end{column}
+  \end{columns}
+  % RFC 8391, Section 4.2. Upper-layer signatures can be reused for the
+  % same lower-tree root; a WOTS+ key must never sign distinct roots.
+\end{frame}
