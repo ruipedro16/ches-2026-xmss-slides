@@ -3,8 +3,15 @@
 \begin{itemize}
   \setlength{\itemsep}{4mm}
   \item High-level assembly language designed for cryptography implementations
-  \item High-level zero-cost abstractions: variables, arrays
-  \item Control over low-level details (e.g. instruction selection, loop unrolling)
+  \begin{itemize}
+    \setlength{\itemsep}{1mm}
+    \item High-level zero-cost abstractions: variables, arrays
+    \item Control over low-level details (e.g. instruction selection, loop unrolling,
+      and whether variables are stored on the stack or in registers)
+  \end{itemize}
+    \item Applicability to the development of high-speed, high-assurance
+    cryptographic primitives has been demonstrated through its application to SHA-3~\cite{CCS:ABBBDG19} 
+    and ML-KEM~\cite{C:AOBBDG24,TCHES:ABBGLL23}.
   \item Suported architectures: x86\_64, ARMv7M, ARMv8-A, RISC-V
 \end{itemize}
 

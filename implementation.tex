@@ -1,10 +1,63 @@
-\begin{frame}{Implementation}
+\begingroup
+\renewcommand{\footnoterule}{}
+\begin{frame}{Implementation: Overview}
+  \begin{block}{Reference implementation in Jasmin}
+    \xmssmt implementation targeting x86\_64, based on
+    the C reference implementation\footnote[frame]{\tiny\url{https://github.com/XMSS/xmss-reference}}.
+    Prioritize readability and closeness
+    to RFC~8391.
+  \end{block}
+  \vspace{2mm}
   \begin{itemize}
-    \item Array sizes are fixed at compile time (one function per size)
+    \setlength{\itemsep}{2mm}
+    \item \textbf{SHA-256 from libjade}\footnote{\tiny\url{https://github.com/formosa-crypto/libjade}};
+      the C reference uses OpenSSL.
+    \item \textbf{Fixed-size data:} stack arrays with sizes known at compile
+      time; a separate hash function for each input length.
+    \item \textbf{Variable-size data:} raw pointers with explicit
+      loads and stores, e.g. for the message to sign.
+    \item \textbf{Aliasing:} array arguments must be disjoint. The \wots
+      chaining function uses a single buffer for in-place updates.
+  \end{itemize}
+\end{frame}
+\endgroup
+
+\begin{frame}{Implementation: Authentication Paths}
+  \begin{itemize}
+    \setlength{\itemsep}{4mm}
+    \item \textbf{TreeHash:} keep intermediate nodes on a stack;
+      merge the top two nodes whenever they have the same height.
+    \item \textbf{Jasmin follows RFC~8391:} compute each authentication-path
+      node with a separate TreeHash call on the corresponding subtree.
+    \item \textbf{C reference:} compute the root and authentication path
+      together in a single TreeHash traversal.
+  \item \textbf{Tradeoff}: Closer correspondence to the RFC simplifies the correctness proof, but increases execution time.
   \end{itemize}
 \end{frame}
 
+\begin{frame}{Implementation: Constant-Time and Zeroization}
+  \begin{itemize}
+    \setlength{\itemsep}{4mm}
+    \item \textbf{Constant-time validated with Jasmin's checker.}
+      Annotate public values loaded from memory, such as message length:
+      the checker treats memory loads as secret by default.
+    \item \textbf{Stack zeroization on return from exported functions:}
+      compiler-generated code clears the stack, ensuring that no secret data remains on the stack after
+      function return.
+  \end{itemize}
+  \vspace{3mm}
+  \begin{block}{Measured overhead}
+    Loop zeroization adds less than $0.4\%$ for all three operations.
+    Unrolling adds about 30\,KB of code and is slightly slower in these
+    benchmarks.
+  \end{block}
+\end{frame}
+
 \begin{frame}{Implementation: Performance}
+{\small XMSS\textsuperscript{MT}-SHA2\_20/2\_256
+  ($h=20$, $d=2$); Intel Core i7-6700 at 3.40\,GHz.\\
+  Single core; Hyperthreading and TurboBoost disabled.\par}
+\vspace{2mm}
 \begin{table}[t!]
 \scriptsize
   \centering
@@ -22,4 +75,13 @@
   Jasmin baseline (columns \#3 and \#4).}
   \label{tab:bench}
 \end{table}
+\vspace{-2mm}
+\begin{itemize}
+  \small
+  \setlength{\itemsep}{1mm}
+  \item \textbf{Keygen and verify:} about $18\%$ fewer cycles, driven by
+    the faster SHA-2 implementation.
+  \item \textbf{Sign:} about $22\%$ more cycles, due to separate TreeHash
+    calls for authentication-path nodes.
+\end{itemize}
 \end{frame}

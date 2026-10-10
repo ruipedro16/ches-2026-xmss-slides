@@ -1,0 +1,21 @@
+% Include inside a frame with \input{wots_diagram}.
+% H denotes one chain step; a WOTS+ step additionally uses a key and bitmask.
+% \begin{tikzpicture}[
+%   >=Latex,font=\small,
+%   hash step/.style={draw=Teal,fill=Mist,rounded corners=1mm,
+%     minimum width=7mm,minimum height=7mm,inner sep=2pt},
+%   chain arrow/.style={->,Teal,line width=0.8pt}
+% ]
+%   \node[text=Gold] (secret) at (0,0) {$x_k$};
+%   \node[hash step] (h1) at (1,0) {$H$};
+%   \node (v1) at (2.4,0) {$H(x_k)$};
+%   \node[hash step] (h2) at (3.9,0) {$H$};
+%   \node (v2) at (5.7,0) {$H(H(x_k))$};
+%   \node[hash step] (h3) at (7.5,0) {$H$};
+%   \node[text=Teal,anchor=west] (public) at (8.5,0)
+%     {$\mathit{pub}_k=H\bigl(H(H(x_k))\bigr)$};
+%   \foreach \source/\target in {secret/h1,h1/v1,v1/h2,h2/v2,v2/h3,h3/public}
+%     \draw[chain arrow] (\source) -- (\target);
+%   \node[text=Muted,font=\footnotesize] at (6,-0.85)
+%     {Example Winternitz chain: $w=4$, three hash steps.};
+% \end{tikzpicture}

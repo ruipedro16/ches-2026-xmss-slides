@@ -27,6 +27,8 @@
 \definecolor{Mist}{HTML}{EDF4F6}
 \definecolor{Muted}{HTML}{526575}
 
+\hypersetup{colorlinks=true,urlcolor=Teal,linkcolor=Navy,citecolor=Teal}
+
 \setbeamercolor{normal text}{fg=Navy,bg=white}
 \setbeamercolor{frametitle}{fg=Navy}
 \setbeamercolor{structure}{fg=Teal}
@@ -39,10 +41,8 @@
 \setbeamertemplate{itemize items}[circle]
 \setbeamersize{text margin left=8mm,text margin right=8mm}
 \setbeamertemplate{frametitle}{\vspace{4mm}\insertframetitle\par\vspace{1mm}}
-\setbeamertemplate{footline}{\hspace{8mm}\scriptsize\color{Muted}Completing
-  the Chain: Verified Implementations of
-  Hash-Based Signatures and Their Security\hfill CHES
-2026\hspace{5mm}\insertframenumber\hspace{8mm}\vspace{3mm}}
+\setbeamertemplate{footline}{\hfill\scriptsize\color{Muted}%
+  \insertframenumber\hspace{8mm}\vspace{3mm}}
 
 \title{Completing the Chain:}
 \subtitle{Verified Implementations of Hash-Based Signatures\\and Their Security}
@@ -63,12 +63,12 @@ Fernandes}\\ Andreas H\"ulsing \and Matthias Meijers \and Pierre-Yves Strub}
         \centering
         \begin{minipage}{23mm}
           \centering
-          {\color{black}\qrcode[height=19mm,level=M]{https://github.com/formosa-crypto/formosa-xmss}}\par\vspace{2mm}
-          {\scriptsize\color{Muted}Repository}
+          {\hypersetup{urlcolor=black}\color{black}\qrcode[height=19mm,level=M]{https://github.com/formosa-crypto/formosa-xmss}}\par\vspace{2mm}
+          {\scriptsize\color{Muted}GitHub Repository}
         \end{minipage}\hfill
         \begin{minipage}{23mm}
           \centering
-          {\color{black}\qrcode[height=19mm,level=M]{https://doi.org/10.46586/tches.v2026.i3.958-981}}\par\vspace{2mm}
+          {\hypersetup{urlcolor=black}\color{black}\qrcode[height=19mm,level=M]{https://doi.org/10.46586/tches.v2026.i3.958-981}}\par\vspace{2mm}
           {\scriptsize\color{Muted}Paper}
         \end{minipage}
     \end{minipage}};
@@ -89,6 +89,9 @@ Fernandes}\\ Andreas H\"ulsing \and Matthias Meijers \and Pierre-Yves Strub}
 \input{diagram}
 \input{verification}
 \input{implementation}
+\input{treehash}
+\input{correctness_proof}
+% \input{future_work}
 
 \begin{frame}[plain]
   \centering
