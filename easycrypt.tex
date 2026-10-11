@@ -1,5 +1,19 @@
-\begin{frame}{EasyCrypt}
+\begin{frame}{\EasyCrypt}
   \begin{itemize}
-    \item Interactive proof assistant.
+      \setlength{\itemsep}{3mm}
+    \item Interactive proof assistant used for cryptographic security proofs
+      and reasoning about program correctness.
+    \item Supports several logics:
+      \begin{itemize}
+          \setlength{\itemsep}{2mm}
+        \item \textbf{Ambient Logic (AL):} structures proofs and combines
+          results from the other logics.
+        \item \textbf{Hoare Logic (HL):} proves properties of a single
+          program using preconditions and postconditions.
+        \item \textbf{Probabilistic Hoare Logic (pHL):} proves bounds on
+          the probability of a program satisfying a postcondition.
+        \item \textbf{Probabilistic Relational Hoare Logic (pRHL):}
+          proves equivalences between two probabilistic programs.
+      \end{itemize}
   \end{itemize}
 \end{frame}

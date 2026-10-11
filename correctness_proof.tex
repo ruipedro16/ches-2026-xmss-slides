@@ -1,71 +1,62 @@
-% Based on Section 4.2 of Completing the Chain (TCHES 2026).
-\begin{frame}{Functional Correctness: Proof Approach}
-  \begin{block}{Goal}
-    Prove that the Jasmin implementation of \xmssmt agrees with the
-    RFC-like EasyCrypt specification from Section~3 of the paper.
-  \end{block}
-  \vspace{2mm}
+\begin{frame}{Functional Correctness Proof}
   \begin{itemize}
-    \setlength{\itemsep}{3mm}
-    \item Extract an EasyCrypt representation of the Jasmin program
-      using the Jasmin compiler.
-    \item Prove \textbf{pRHL equivalence lemmas} relating the extracted
-      code to the specification, under matching parameters and inputs.
-    \item Show that both sides make consistent calls to the underlying
-      hash function; assume correctness of the SHA-2 implementation.
+      \setlength{\itemsep}{4mm}
+      \item \textbf{Goal}: Prove that the Jasmin implementation of \xmssmt adheres to the
+    RFC-like \EasyCrypt specification.
+    \item Extract an \EasyCrypt representation of the Jasmin program
+      using the Jasmin compiler. Program equivalence is then expressed via \textbf{pRHL} statements.
+    \item We assume the functional correctness of the underlying SHA-256 implementation.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Functional Correctness: Relating Representations}
+\begin{frame}[fragile]
+  {Functional Correctness: Relating Representations}
   \begin{itemize}
-    \setlength{\itemsep}{4mm}
+      \setlength{\itemsep}{4mm}
     \item \textbf{Specification:} records for keys and signatures.
-    \item \textbf{Implementation:} byte arrays and memory buffers.
+    \item \textbf{Implementation:} byte arrays and raw pointers.
     \item Encoding and decoding operators connect these representations
   \end{itemize}
-  \vspace{3mm}
-  \begin{block}{What the equivalence lemmas establish}
-    \textbf{Key generation:} implementation key buffers correspond to
-    the specification's public and secret keys.\par\vspace{2mm}
-    \textbf{Verification:} the implementation returns a 64-bit zero
-    \emph{if and only if} the specification accepts the signature.
-  \end{block}
+  \vspace{1mm}
+
+  \begin{figure}[t!]
+    \centering
+    \begin{minipage}{.65\textwidth}
+      \begin{easycrypt}[basicstyle=\fontsize{7}{8}\selectfont\ttfamily]{}{}
+lemma xmss_kg_correct : 
+    n = XMSS_N /\ (* remaining parameters ommited *) =>
+    equiv [
+      M(Syscall).__xmssmt_core_keypair ~ XMSS_MT_PRF.kg :
+      true 
+      ==>
+      res{1}.`1 = DecodePkNoOID res{2}.`2 /\
+      res{1}.`2 = DecodeSkNoOID res{2}.`1
+    ].\end{easycrypt}
+    \end{minipage}
+    \caption{\EasyCrypt lemma stating the correctness of the key generation algorithm.}
+  \end{figure}
 \end{frame}
 
-\begin{frame}{Functional Correctness: Reasoning About Memory}
+\begin{frame}[fragile]
+  {Functional Correctness Proof: Reasoning About Memory}
   \begin{itemize}
-    \setlength{\itemsep}{3mm}
     \item Raw pointers require explicit reasoning about address arithmetic
-      and the contents of memory.
-    \item \textbf{\texttt{valid\_ptr\_i}:} adding an accessed non-negative
-      offset does not overflow the 64-bit address space.
-    \item \textbf{\texttt{disjoint\_ptr}:} the specified memory regions
-      do not overlap.
-  \end{itemize}
-  \vspace{3mm}
-  \begin{block}{Example: signature verification}
-    The signed-message input, recovered-message output, and output-length
-    buffer are assumed disjoint. Writes to the outputs cannot modify
-    input data or interfere with each other.
-  \end{block}
-\end{frame}
-
-\begin{frame}{Functional Correctness: TreeHash}
-  \begin{itemize}
-    \setlength{\itemsep}{3mm}
-    \item \textbf{Most demanding proof:} relate the intermediate stacks
-      and loop state of the implementation and specification.
-    \item The relational loop invariant establishes \textbf{identical
-      stack accesses} and matching results, avoiding a second proof
-      of stack bounds at this stage.
-    \item \textbf{Safety checked separately:} Jasmin's safety checker
-      guarantees that the implementation performs no out-of-bounds access.
-    \item Stack accesses in the RFC specification are proved within bounds
-      later, when connecting it to the security proof.
+      and the contents of memory (e.g. pointers don't overlap and do not overflow the 64-bit address space).
   \end{itemize}
   \vspace{2mm}
-  \begin{block}{Proof structure}
-    The equivalence proof establishes matching computation;
-    the separate safety check establishes safe memory accesses.
-  \end{block}
+    \begin{figure}[t!]
+    \centering
+    \begin{minipage}{.6\textwidth}
+      \begin{easycrypt}[basicstyle=\fontsize{7}{8}\selectfont\ttfamily]{}{}
+pred valid_ptr_i (p : W64.t) (o : int) = 
+  0 <= o => 
+    0 <= to_uint p /\ to_uint (p) + o < W64.modulus.
+
+pred disjoint_ptr (p1 l1 p2 l2 : int) =
+  forall (k1 : int), 0 <= k1 < l1 =>
+    forall (k2 : int), 0 <= k2 < l2 =>
+      p1 + k1 <> p2 + k2.\end{easycrypt}
+    \end{minipage}
+    \caption{Pointer predicates in \EasyCrypt.}
+  \end{figure}
 \end{frame}

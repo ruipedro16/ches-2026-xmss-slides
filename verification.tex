@@ -17,8 +17,7 @@ axiom hash_128 (x : W8.t Array128.t):
     arg.`2 = x
     ==>
     to_list res = NBytes.val (Hash (to_list x))
-  ] = 1%r.
-      \end{easycrypt}
+  ] = 1%r.\end{easycrypt}
     \end{minipage}
     \caption{\EasyCrypt axiom stating the correctness of SHA-256.}
   \end{figure}
@@ -28,8 +27,8 @@ axiom hash_128 (x : W8.t Array128.t):
   \begin{itemize}
     \setlength{\itemsep}{4mm}
     \item Jasmin compiler: unverified OCaml code (parsing and typing)
-    \item Jasmin extraction to EasyCrypt
-    \item EasyCrypt codebase
+    \item Jasmin extraction to \EasyCrypt
+    \item \EasyCrypt codebase
     \item SMT Solvers (Z3, CVC4 and Alt-Ergo)
   \end{itemize}
 \end{frame}

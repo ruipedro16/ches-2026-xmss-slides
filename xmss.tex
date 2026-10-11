@@ -4,90 +4,74 @@
   xmss hidden/.style={opacity=0,text opacity=0},
   xmss show/.code args={<#1>}{\alt<#1>{}{\pgfkeysalso{xmss hidden}}},
   xmss node/.style={circle,draw=Teal,fill=Mist,minimum size=5mm,
-    inner sep=0pt}
+  inner sep=0pt}
 }
 
-% Example tree with height h=3.
+% The highlighted parent and its two children are expanded on the right.
 \newcommand{\xmsskeygentree}{%
-  \begin{tikzpicture}[x=0.68cm,y=0.68cm,font=\scriptsize,>=Latex]
-    \node[anchor=east,text=Teal] at (-0.45,0) {$i:$};
-    \foreach \i in {0,...,7} {
-      \node[xmss node]
-        (l\i) at (\i,0) {$\i$};
-      % Two vertically separated keys represent the secret/public keypair.
-      \begin{scope}[shift={(\i,-1.35)},draw=Gold,line width=0.7pt]
-        \foreach \keyheight in {-0.16,0.16} {
-          \draw (-0.15,\keyheight) circle[radius=0.075cm];
-          \draw (-0.04,\keyheight) -- (0.22,\keyheight);
-          \draw (0.13,\keyheight) -- (0.13,\keyheight-0.10);
-          \draw (0.22,\keyheight) -- (0.22,\keyheight-0.10);
-        }
-      \end{scope}
-      \draw[->,Teal] (\i,-1.05) --
-        node[midway,right,rotate=90,anchor=south,font=\tiny] {LTree}
-        (l\i.south);
-    }
-    \node[text=Gold] at (3.5,-1.95) {\wots keypairs};
+  \begin{tikzpicture}[x=0.75cm,y=0.75cm,font=\scriptsize,>=Latex]
+    \foreach \i in {0,...,7}
+    \node[xmss node] (l\i) at (\i,0) {};
     \foreach \i/\x in {0/0.5,1/2.5,2/4.5,3/6.5} {
       \node[xmss node] (p\i) at (\x,1) {};
       \pgfmathtruncatemacro{\leftleaf}{2*\i}
       \pgfmathtruncatemacro{\rightleaf}{2*\i+1}
-      \draw[Muted] (p\i) -- (l\leftleaf);
-      \draw[Muted] (p\i) -- (l\rightleaf);
+      \draw[->,Teal] (l\leftleaf) -- (p\i);
+      \draw[->,Teal] (l\rightleaf) -- (p\i);
     }
     \node[xmss node] (q0) at (1.5,2) {};
     \node[xmss node] (q1) at (5.5,2) {};
-    \foreach \parent/\child in {q0/p0,q0/p1,q1/p2,q1/p3}
-      \draw[Muted] (\parent) -- (\child);
-    \node[xmss node,label=above:{public root}]
-      (r) at (3.5,3) {};
-    \foreach \child in {q0,q1}
-      \draw[Muted] (r) -- (\child);
-    % Zoom in on the randomized hash used to combine two child nodes.
-    \draw[Gold,densely dotted,line width=0.8pt]
-      (5.5,1.3) ellipse[x radius=1.75,y radius=1.25];
-    \begin{scope}[shift={(11,1.1)}]
-      \node[xmss node] (zoomparent) at (0,2.1) {$P$};
-      \node[draw=Teal,fill=Mist,rounded corners,minimum width=12mm,
-        minimum height=6mm] (zoomhash) at (0,1.15) {$H_{K}$};
-      \node[draw=Teal,circle,fill=Mist,inner sep=2pt] (maskleft)
-        at (-1,0.1) {$\oplus$};
-      \node[draw=Teal,circle,fill=Mist,inner sep=2pt] (maskright)
-        at (1,0.1) {$\oplus$};
-      \node[xmss node] (zoomleft) at (-1,-1) {$L$};
-      \node[xmss node] (zoomright) at (1,-1) {$R$};
-      \draw[->,Teal] (zoomleft) -- (maskleft);
-      \draw[->,Teal] (zoomright) -- (maskright);
-      \draw[->,Teal] (maskleft) -- (zoomhash.south west);
-      \draw[->,Teal] (maskright) -- (zoomhash.south east);
-      \draw[->,Teal] (zoomhash) -- (zoomparent);
-      \draw[->,Gold] (-2.5,0.1) -- node[above,font=\tiny]
-        {$\mathsf{BM}_L$} (maskleft);
-      \draw[->,Gold] (2.5,0.1) -- node[above,font=\tiny]
-        {$\mathsf{BM}_R$} (maskright);
-      \draw[Gold,densely dotted,line width=0.8pt]
-        (0,0.6) ellipse[x radius=2.7,y radius=2.2];
-      \node[align=center,text=Muted,font=\tiny] at (0,-2.25)
-        {Key and masks from \texttt{pub\_seed}\\and the node address via PRF};
+    \node[xmss node,label=above:{root}] (root) at (3.5,3) {};
+    \foreach \child/\parent in {p0/q0,p1/q0,p2/q1,p3/q1,q0/root,q1/root}
+    \draw[->,Teal] (\child) -- (\parent);
+    \node[below=3mm of l3,anchor=north,align=center,xshift=3.75mm]
+    {Leaves: \ltree-compressed \wots public keys};
+    \draw[Gold,densely dotted,thick] (5.5,1.5) ellipse (1.6 and 1.05);
+    \draw[Gold,densely dotted] (6.1,2.45) -- (9.6,3.5);
+    \draw[Gold,densely dotted] (6.1,0.55) -- (9.6,-0.5);
+    \begin{scope}[shift={(11.1,1.5)}]
+      \draw[Gold,densely dotted,thick] (0,0.25) ellipse (2.6 and 2.75);
+      \node[xmss node,minimum size=9mm,font=\tiny,align=center]
+      (parent) at (0,2.35) {parent\\node};
+      \node[draw=Teal,fill=Mist,rounded corners=1mm,
+      minimum width=21mm,minimum height=6mm] (hash) at (0,0.7) {keyed hashing};
+      \node[xmss node,minimum size=9mm,font=\tiny] (left) at
+      (-1,-1.6) {left child};
+      \node[xmss node,minimum size=9mm,font=\tiny] (right) at
+      (1,-1.6) {right child};
+      \node[xmss node] (xorleft) at (-1,-0.6) {$\oplus$};
+      \node[xmss node] (xorright) at (1,-0.6) {$\oplus$};
+      \draw[->,Teal] (left) -- (xorleft);
+      \draw[->,Teal] (right) -- (xorright);
+      % Keep the two masked inputs separate until they enter the hash.
+      \draw[->,Teal] (xorleft.north) -- ([xshift=-6mm]hash.south);
+      \draw[->,Teal] (xorright.north) -- ([xshift=6mm]hash.south);
+      \draw[->,Teal] (hash) -- (parent);
+      \draw[->,Gold] (-2.4,-0.6) -- node[above,font=\tiny] {mask}
+      (xorleft.west);
+      \draw[->,Gold] (2.4,-0.6) -- node[above,font=\tiny] {mask}
+      (xorright.east);
+      \draw[->,Gold] (-2.4,0.7) -- node[above,font=\tiny] {key} (hash.west);
     \end{scope}
-    \draw[Gold,densely dotted] (6.1,2.45) -- (10,3.7);
-    \draw[Gold,densely dotted] (6.4,0.2) -- (10,-0.8);
   \end{tikzpicture}%
 }
 
 \begin{frame}{\xmss: Overview}
   \begin{itemize}
-    \setlength{\itemsep}{4mm}
-    \item XMSS~\cite{DBLP:conf/pqcrypto/BuchmannDH11} is a stateful hash-based signature scheme.
+      \setlength{\itemsep}{4mm}
+    \item XMSS~\cite{DBLP:conf/pqcrypto/BuchmannDH11} is a stateful
+      hash-based signature scheme.
     \item Security relies on the security of the underlying hash function.
     \item XMSS combines a one-time signature scheme (\wots) with a Merkle tree.
-    \vspace{2mm}
-    \begin{itemize}
-      \setlength{\itemsep}{1mm}
-      \item The root of the Merkle tree is the public key of the XMSS instance.
-      \item Each leaf corresponds to a (compressed) \wots public key.
-      \item A Merkle tree of height $h$ has $2^h$ leaves, and thus allows signing $2^h$ messages.
-    \end{itemize}
+      \vspace{2mm}
+      \begin{itemize}
+          \setlength{\itemsep}{1mm}
+        \item The root of the Merkle tree is the public key of the
+          XMSS instance.
+        \item Each leaf corresponds to a (compressed) \wots public key.
+        \item A Merkle tree of height $h$ has $2^h$ leaves, and thus
+          allows signing $2^h$ messages.
+      \end{itemize}
   \end{itemize}
 \end{frame}
 
@@ -95,13 +79,16 @@
 \begin{frame}{\wots: Key Generation}
   \footnotesize
   \begin{enumerate}
-    \setlength{\itemsep}{1mm}
+      \setlength{\itemsep}{1mm}
     \item Generate $\ell$ secret $n$-byte values
       $\mathsf{sk}_0,\ldots,\mathsf{sk}_{\ell-1}$ (pseudorandomly)
-    \item Each value starts a hash chain: apply the chaning function $w-1$ steps to obtain
+    \item Each value starts a hash chain: apply the chaning function
+      $w-1$ steps to obtain
       % $\mathsf{pk}_j=\mathsf{chain}(\mathsf{sk}_j,0,w-1)$.
-      \item The chaining function is defined as $c_k^i(x,\mathbf{r}) = f_k(c_k^{i-1}(x,\mathbf{r})\oplus{r_i})$, with $c_k^0(x,\mathbf{r}) = x$, 
-      where $\mathbf{r}$ are randomizers and $k$ is keying parameter for the hash function.\\
+    \item The chaining function is defined as $c_k^i(x,\mathbf{r}) =
+      f_k(c_k^{i-1}(x,\mathbf{r})\oplus{r_i})$, with $c_k^0(x,\mathbf{r}) = x$,
+      where $\mathbf{r}$ are randomizers and $k$ is keying parameter
+      for the hash function.\\
   \end{enumerate}
   \vspace{0mm}
   \begin{center}
@@ -110,9 +97,9 @@
       \foreach \j/\y in {0/1,1/0,\ell-1/-1} {
         \node[anchor=east,text=Gold] at (-0.3,\y) {$\mathsf{sk}_{\j}$};
         \foreach \k in {0,...,3}
-          \node[xmss node] (k\y\k) at (\k,\y) {};
+        \node[xmss node] (k\y\k) at (\k,\y) {};
         \foreach \k/\next in {0/1,1/2,2/3}
-          \draw[->,Teal] (k\y\k) -- (k\y\next);
+        \draw[->,Teal] (k\y\k) -- (k\y\next);
         \node[anchor=west,text=Teal] at (3.3,\y) {$\mathsf{pk}_{\j}$};
       }
       \node at (1.5,-1.65) {Example: $w=4$};
@@ -120,8 +107,10 @@
   \end{center}
   \vspace{1mm}
   {\footnotesize
-    \textbf{Secret key:} $\mathsf{SK}=(\mathsf{sk}_0,\ldots,\mathsf{sk}_{\ell-1})$\\[1mm]
-    \textbf{Public key:} $\mathsf{PK}=(\mathsf{pk}_0,\ldots,\mathsf{pk}_{\ell-1})$\\[1mm]
+    \textbf{Secret key:}
+    $\mathsf{SK}=(\mathsf{sk}_0,\ldots,\mathsf{sk}_{\ell-1})$\\[1mm]
+    \textbf{Public key:}
+    $\mathsf{PK}=(\mathsf{pk}_0,\ldots,\mathsf{pk}_{\ell-1})$\\[1mm]
     $n$: element size in bytes; $w$: Winternitz parameter;
     $\ell$: number of message and checksum digits.\\[1mm]
   }
@@ -130,7 +119,7 @@
 \begin{frame}{\wots: Signature Generation \& Verification}
   \small
   \begin{enumerate}
-    \setlength{\itemsep}{2mm}
+      \setlength{\itemsep}{2mm}
     \item Encode the message as base-$w$ digits
       $m_0,\ldots,m_{\ell_1-1}$
     \item Append the base-$w$ digits of the checksum
@@ -139,7 +128,8 @@
     \item The signature is $(\sigma_0,\ldots,\sigma_{\ell-1})$, where
       $\sigma_j=c_k^{b_j}(\mathsf{sk}_j,\mathbf{r})$.
     \item To verify a signature, it suffices to
-      confirm that completing the chains permits reconstructing the \wots public key.
+      confirm that completing the chains permits reconstructing the
+      \wots public key.
   \end{enumerate}
   \vspace{2mm}
   \begin{center}
@@ -147,12 +137,12 @@
       \foreach \j/\y/\digit in {0/1/1,1/0/3,2/-1/2} {
         \node[anchor=east] at (-0.3,\y) {$b_{\j}=\digit$};
         \foreach \k in {0,...,3}
-          \node[xmss node,draw=Muted,fill=white] (s\j\k) at (\k,\y) {};
+        \node[xmss node,draw=Muted,fill=white] (s\j\k) at (\k,\y) {};
         \foreach \k/\next in {0/1,1/2,2/3} {
           \ifnum\k<\digit
-            \draw[->,Teal,thick] (s\j\k) -- (s\j\next);
+          \draw[->,Teal,thick] (s\j\k) -- (s\j\next);
           \else
-            \draw[->,Muted,dashed] (s\j\k) -- (s\j\next);
+          \draw[->,Muted,dashed] (s\j\k) -- (s\j\next);
           \fi
         }
         \node[xmss node,draw=Gold,fill=Gold!20] at (s\j\digit) {};
@@ -173,20 +163,21 @@
     \begin{column}{0.55\textwidth}
       \textbf{Input:} $\ell$ public-key elements, each $n$ bytes.
       \begin{enumerate}
-        \setlength{\itemsep}{2.5mm}
-        \item Hash adjacent pairs with randomized hashing (hash keys and masks are derived from
-        \texttt{pub\_seed} and the \ltree address).
+          \setlength{\itemsep}{2.5mm}
+        \item Hash adjacent pairs with randomized hashing (hash keys
+            and masks are derived from
+          \texttt{pub\_seed} and the \ltree address).
         \item If a level has an odd number of nodes, carry the
           last node to the next level unchanged.
         \item Repeat until a single $n$-byte node remains.
       \end{enumerate}
-      
+
     \end{column}
     \begin{column}{0.42\textwidth}
       \centering
       \begin{tikzpicture}[x=0.95cm,y=0.85cm,font=\scriptsize,>=Latex]
         \foreach \i in {0,...,4}
-          \node[xmss node] (p\i) at (\i,0) {$\mathsf{pk}_{\i}$};
+        \node[xmss node] (p\i) at (\i,0) {$\mathsf{pk}_{\i}$};
         \node[xmss node] (a) at (0.5,1) {};
         \node[xmss node] (b) at (2.5,1) {};
         \node[xmss node,draw=Gold,fill=Gold!20] (c) at (4,1) {};
@@ -194,12 +185,12 @@
         \node[xmss node,draw=Gold,fill=Gold!20] (e) at (4,2) {};
         \node[xmss node] (root) at (2.75,3) {};
         \foreach \child/\parent in {p0/a,p1/a,p2/b,p3/b,a/d,b/d,d/root,e/root}
-          \draw[->,Teal] (\child) -- (\parent);
+        \draw[->,Teal] (\child) -- (\parent);
         \draw[->,Gold,dashed] (p4) -- (c);
         \draw[->,Gold,dashed] (c) -- (e);
         \node[above=1mm of root] {$n$-byte XMSS leaf};
         \node[below=3mm of p2,align=center]
-          {Example: $\ell=5$\\Gold dashed arrows: carry unchanged};
+        {Example: $\ell=5$\\Gold dashed arrows: carry unchanged};
       \end{tikzpicture}
     \end{column}
   \end{columns}
@@ -212,86 +203,67 @@
 \end{frame}
 
 \begin{frame}{\xmss: Key Generation}
-  \small
-  \setbeamerfont{itemize/enumerate body}{size=\footnotesize}
-  \begin{columns}[T,onlytextwidth]
-    \begin{column}{0.47\textwidth}
-      \begin{enumerate}
-        \setlength{\itemsep}{0.5mm}
-        \setlength{\parsep}{0pt}
-        \item Sample three random $n$-byte seeds:
-          \begin{itemize}
-            \footnotesize
-            \setlength{\itemsep}{0.5mm}
-            \setlength{\parsep}{0pt}
-            \item \texttt{sk\_seed}: PRF seed for \wots secret keys;
-              keeps the secret key compact.
-            \item \texttt{sk\_prf}: PRF key for message-hashing randomizers.
-            \item \texttt{pub\_seed}: PRF key for randomized-hashing bitmasks.
-          \end{itemize}
-        \item Initialize the signing-key index: $i=0$.
-        \item Compute the tree root from the \wots public keys,
-          (compressed into leaves via \ltree).
-      \end{enumerate}
-    \end{column}
-    \begin{column}{0.50\textwidth}
-      \centering
-      \resizebox{\linewidth}{!}{\xmsskeygentree}\\[1mm]
-      {\footnotesize $i=0,\ldots,2^h-1$}\\[1mm]
-      \small Example: $h=3$ ($2^h$ leaves)
-
-    \end{column}
-  \end{columns}
-  \vspace{0mm}
+  \footnotesize
+  \begin{enumerate}
+      \setlength{\itemsep}{0.5mm}
+    \item Sample $n$-byte seeds \texttt{sk\_seed}, \texttt{sk\_prf},
+      and \texttt{pub\_seed}; initialize the signing index $i=0$.
+    \item Derive \wots secret keys via a PRF keyed by
+      \texttt{sk\_seed}; compute and compress (via \ltree) the $2^h$
+      public keys.
+    \item Build the \xmss tree by hashing pairs of sibling nodes
+      together to obtain the root.
+      A PRF keyed by \texttt{pub\_seed} derives hash keys and
+      bitmasks using the node address.
+  \end{enumerate}
+  \vspace{1mm}
+  {\centering \resizebox{0.48\textwidth}{!}{\xmsskeygentree}\par}
+  \vspace{2mm}
   {\footnotesize
-    \textbf{Public key:} $\mathsf{PK}=(\mathsf{root},\mathtt{pub\_seed})$.\\
-    \textbf{Secret key:} $\mathsf{SK}=(i,\mathtt{sk\_seed},\mathtt{sk\_prf},\mathsf{PK})$.\\
-    \textbf{\xmssmt:} same process, but compute the root of the top tree
-    in the hypertree; each tree has height $h/d$.
+    \textbf{Secret key:}
+    $\mathsf{SK}=(i,\mathtt{sk\_seed},\mathtt{sk\_prf},\mathsf{PK})$
+    \hfill
+    \textbf{Public key:} $\mathsf{PK}=(\mathsf{root},\mathtt{pub\_seed})$\\[1mm]
+    \texttt{sk\_prf}: PRF key for message-hashing randomizers during signing.
   }
 \end{frame}
 
 \begin{frame}{\xmss: Signature Generation}
   \small
   \begin{enumerate}
-    \setlength{\itemsep}{2mm}
-    \item Use the current secret-key index $i$ to select the one-time key;
-      update the stored index to prevent key reuse.
-    \item Derive the pseudorandom value $R$ using a PRF keyed by
-      \texttt{sk\_prf}, and compute the message digest using $R$.
+      \setlength{\itemsep}{2mm}
+    \item Set the index $i$ to the current secret key index:
+      (indicates the one-time \wots key used).
+    \item Update the index in the secret key to prevent key reuse.
+    \item Derive a pseudorandom value $R$ using a PRF keyed by
+      \texttt{sk\_prf}, then compute the message digest using $R$.
     \item Sign the digest with the selected \wots secret key.
-    \item Compute the Merkle authentication path for leaf $i$:
-      it authenticates the corresponding \wots public key.
+    \item Compute the authentication path for leaf $i$:
+      it authenticates the corresponding \wots public key in the \xmss tree.
+    \item The signature is
+      $\sigma=(i,R,\sigma_{\mathrm{WOTS}^{+}},\mathsf{auth})$
   \end{enumerate}
-  \begin{block}{Signature}
-    $\sigma=(i,R,\sigma_{\mathrm{WOTS}^{+}},\mathsf{auth})$:
-    index, randomizer, \wots signature, and authentication path.
-  \end{block}
-  {\footnotesize
-    \textbf{\xmssmt:} include one \wots signature and authentication path
-    per layer. For layers $j=1,\ldots,d-1$, sign the root of the tree
-    below; the initial message digest is computed only once.
-  }
 \end{frame}
 
 \begin{frame}{\xmss: Signature Verification}
   \relax
   {\small
     \textbf{Inputs}: message $M$, $\mathsf{PK}=(\mathsf{root},\mathsf{SEED})$,
-    $\sigma=(i,R,\sigma_{\mathrm{\wots}},\mathsf{auth}_i)$, with $0\leq i<2^h$.\par}
+    $\sigma=(i,R,\sigma_{\mathrm{\wots}},\mathsf{auth}_i)$, with $0\leq
+  i<2^h$.\par}
   \vspace{2mm}
   \begin{columns}[T,onlytextwidth]
     \begin{column}{0.54\textwidth}
       \begin{enumerate}
-        \small
-        \setlength{\itemsep}{0.5mm}
-        \item<1-> Recompute the message digest $D = H_{\mathrm{msg}}(R\mathbin\Vert\mathsf{root}\mathbin\Vert i,M)$.
-        \item<2-> Complete the \wots chains from
-          $\sigma_{\mathrm{\wots}}$ to recover $\mathsf{pk}_i$.
-        \item<3->LTree compression gives leaf $i$.
-        \item<4-> Hash upward with the $h$ authentication siblings.
-          Bits of $i$ determine left/right order.
-        \item<5-> Accept if the reconstructed root equals
+          \small
+          \setlength{\itemsep}{0.5mm}
+        \item Reconstruct the message digest using $R$.
+        \item Complete the \wots chains from
+          $\sigma_{\mathrm{\wots}}$ to recover the \wots public key.
+        \item \ltree compression of the \wots public key gives us the
+          $i$-th leaf of the \xmss tree.
+        \item Use the authentication path to compute the root of the \xmss tree.
+        \item Accept if the reconstructed root equals
           $\mathsf{root}$ in the public key.
       \end{enumerate}
     \end{column}
@@ -300,7 +272,7 @@
       \vspace{2mm}
       \begin{tikzpicture}[x=0.68cm,y=0.7cm,font=\scriptsize]
         \foreach \i in {0,...,7}
-          \node[xmss node,draw=Muted!45,fill=white] (v\i) at (\i,0) {};
+        \node[xmss node,draw=Muted!45,fill=white] (v\i) at (\i,0) {};
         \foreach \i/\x in {0/0.5,1/2.5,2/4.5,3/6.5} {
           \node[xmss node,draw=Muted!45,fill=white] (p\i) at (\x,1) {};
           \pgfmathtruncatemacro{\leftleaf}{2*\i}
@@ -311,18 +283,18 @@
         \node[xmss node,draw=Muted!45,fill=white] (q0) at (1.5,2) {};
         \node[xmss node,draw=Muted!45,fill=white] (q1) at (5.5,2) {};
         \node[xmss node,draw=Muted!45,fill=white,label=above:{public root}]
-          (r) at (3.5,3) {};
+        (r) at (3.5,3) {};
         \foreach \parent/\child in {q0/p0,q0/p1,q1/p2,q1/p3,r/q0,r/q1}
-          \draw[Muted!40] (\parent) -- (\child);
+        \draw[Muted!40] (\parent) -- (\child);
         \foreach \name in {v3,p0,q1}
-          \node[xmss node,draw=Gold,fill=Gold!20] at (\name) {};
+        \node[xmss node,draw=Gold,fill=Gold!20] at (\name) {};
         \foreach \name/\step in {v2/2,p1/3,q0/4,r/5}
-          \node[xmss node,fill=Teal!25,xmss show=<\step->] at (\name) {};
+        \node[xmss node,fill=Teal!25,xmss show=<\step->] at (\name) {};
         \foreach \parent/\child/\step in {p1/v2/3,q0/p1/4,r/q0/5}
-          \draw[Teal,line width=1.2pt,xmss show=<\step->]
-            (\parent) -- (\child);
+        \draw[Teal,line width=1.2pt,xmss show=<\step->]
+        (\parent) -- (\child);
         \node[below=2mm of v2,align=center,xmss show=<2->]
-          {$\mathrm{LTree}(\mathsf{pk}_i)$\\$i=2$};
+        {$\mathrm{LTree}(\mathsf{pk}_i)$\\$i=2$};
       \end{tikzpicture}\\[1mm]
       {\footnotesize\color{Gold}Gold: supplied authentication siblings.}\\
       {\footnotesize\color{Teal}Teal: reconstructed path.}
@@ -331,55 +303,20 @@
 \end{frame}
 
 \begin{frame}{\xmssmt: Multi-Tree Variant}
-  \begin{columns}[T,onlytextwidth]
-    \begin{column}{0.53\textwidth}
-      \begin{itemize}
-        \small
-        \setlength{\itemsep}{2mm}
-        \item \xmssmt generalizes \xmss by replacing the single Merkle tree with a hypertree of $d$
-        layers, each of which contains a Merkle tree of height $\frac{h}{d}$\\
-        \item Allows the total number of signatures to be increased while keeping running times
-manageable, at the expense of increased signature size
-      \end{itemize}
-      \uncover<4->{%
-        {\setbeamerfont{block title}{size=\small}
-          \setbeamerfont{block body}{size=\footnotesize}
-          \begin{block}{Tradeoff}
-            $2^h$ messages; smaller trees to generate.\\[1mm]
-            Signature: $d$ \wots signatures and $h$ path nodes.\\[1mm]
-            For $d=1$, \xmssmt is functionally equivalent to \xmss.
-          \end{block}}}
-    \end{column}
-    \begin{column}{0.44\textwidth}
-      \centering
-      \vspace{2mm}
-      \begin{tikzpicture}[x=1cm,y=0.75cm,font=\scriptsize,>=Latex]
-        \node[xmss node,label=above:{public root}] (r) at (2.4,4.6) {};
-        \node[xmss node] (p0) at (1.2,3.9) {};
-        \node[xmss node] (p1) at (3.6,3.9) {};
-        \foreach \parent in {p0,p1}
-          \draw[Teal] (r) -- (\parent);
-        \foreach \j/\x/\parent in {0/0.6/p0,1/1.8/p0,2/3.0/p1,3/4.2/p1} {
-          \node[xmss node] (u\j) at (\x,3.1) {};
-          \draw[Teal] (\parent) -- (u\j);
-          \coordinate (b\j) at (\x,1.9);
-          \draw[Teal,fill=Mist,xmss show=<2->]
-            (b\j) -- (\x-0.5,0.9) -- (\x+0.5,0.9) -- cycle;
-          \draw[->,Gold,thick,xmss show=<3->] (b\j) -- (u\j.south);
-        }
-        \node[xmss node,xmss show=<2->] (leaf) at (1.8,0.9) {};
-        \node[xmss show=<2->] (digest) at (1.8,0.1) {$D$};
-        \draw[->,Gold,thick,xmss show=<2->] (digest) -- (leaf);
-        \node[text=Muted,anchor=east] at (4.7,4.7) {top layer};
-        \node[text=Muted,xmss show=<2->,anchor=east] at (4.7,0.2)
-          {bottom layer};
-        \node[text=Gold,xmss show=<3->,fill=white,inner sep=1pt]
-          at (2.4,2.5) {\wots};
-      \end{tikzpicture}\\[2mm]
-      {\footnotesize Example: $h=4$, $d=2$.}\\[1mm]
-      {\scriptsize\color{Gold}Gold arrows: \wots signs a digest or root.}
-    \end{column}
-  \end{columns}
+  \small
+  \begin{itemize}
+      \setlength{\itemsep}{2mm}
+    \item \xmssmt replaces the single \xmss Merkle tree with a hypertree
+      of $d$ layers; each tree has height $h/d$.
+    \item \textbf{Key generation:} compute the root of the top tree
+      in the hypertree to obtain the public root.
+    \item \textbf{Signature generation:} include one \wots signature
+      and its authentication path for each of the $d$ layers.
+      At each upper layer $j=1,\ldots,d-1$, sign the root of the tree
+      below; skip the message-digest computation.
+    \item Allows more signatures while keeping running times manageable,
+      at the expense of increased signature size.
+  \end{itemize}
   % RFC 8391, Section 4.2. Upper-layer signatures can be reused for the
   % same lower-tree root; a \wots key must never sign distinct roots.
 \end{frame}
