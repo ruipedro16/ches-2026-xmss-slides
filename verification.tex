@@ -1,31 +1,8 @@
-\begin{frame}[fragile]{Trusted Computing Base}
-  \begin{itemize}
-    \item Correctness of the SHA-256 implementation is outside the
-      scope of the proof
-  \end{itemize}
-
-  \vspace{7mm}
-  \begin{figure}[t!]
-    \centering
-    \begin{minipage}{.65\textwidth}
-      \begin{easycrypt}{}{}
-op Hash : W8.t list -> nbytes. (* Abstract operator *)
-
-axiom hash_128 (x : W8.t Array128.t):
-  phoare[
-    M(Syscall).hash_plen_3n____sha256:
-    arg.`2 = x
-    ==>
-    to_list res = NBytes.val (Hash (to_list x))
-  ] = 1%r.\end{easycrypt}
-    \end{minipage}
-    \caption{\EasyCrypt axiom stating the correctness of SHA-256.}
-  \end{figure}
-\end{frame}
-
 \begin{frame}{Trusted Computing Base}
   \begin{itemize}
     \setlength{\itemsep}{4mm}
+    \item Correctness of the SHA-256 implementation is outside the
+      scope of the proof
     \item Jasmin compiler: unverified OCaml code (parsing and typing)
     \item Jasmin extraction to \EasyCrypt
     \item \EasyCrypt codebase

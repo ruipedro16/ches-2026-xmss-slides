@@ -17,7 +17,7 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{\xmss: Operations}
+\begin{frame}{\xmss: Overview}
   \begin{itemize}
     \setlength{\itemsep}{4mm}
     \item \textbf{Key generation:} Generate one-time signing keys and build
@@ -25,10 +25,10 @@
       the XMSS public key.
     \item \textbf{Signing:} Sign the message digest with the next unused
       one-time key and include its authentication path in the signature.
-      Update the signing state to prevent key reuse.
+      Update the signing index to prevent key reuse.
     \item \textbf{Verification:} Recover the one-time public key from the
       signature and use the authentication path to reconstruct the tree
-      root. Accept if it matches the root in the XMSS public key.
+      root. If it matches the root in the XMSS public key, then the signature is valid.
     \item \textbf{TreeHash:} An algorithm used to compute the root of a
       subtree by repeatedly hashing pairs of nodes, starting from its leaves.
   \end{itemize}
