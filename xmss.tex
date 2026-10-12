@@ -83,7 +83,7 @@
     \item Generate $\ell$ secret $n$-byte values
       $\mathsf{sk}_0,\ldots,\mathsf{sk}_{\ell-1}$ (pseudorandomly)
     \item Each value starts a hash chain: apply the chaning function
-      $w-1$ steps to obtain
+      $w-1$ steps 
       % $\mathsf{pk}_j=\mathsf{chain}(\mathsf{sk}_j,0,w-1)$.
     \item The chaining function is defined as $c_k^i(x,\mathbf{r}) =
       f_k(c_k^{i-1}(x,\mathbf{r})\oplus{r_i})$, with $c_k^0(x,\mathbf{r}) = x$,
